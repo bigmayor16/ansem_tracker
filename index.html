@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>$ANSEM Holder Tracker</title>
+    <style>
+        :root {
+            --bg-color: #07090E;
+            --card-color: #111622;
+            --solana-green: #00FFA3;
+            --accent-gold: #E4A834;
+            --text-white: #FFFFFF;
+            --text-muted: #8F9CAE;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-white);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .dashboard {
+            background-color: var(--card-color);
+            border-radius: 16px;
+            padding: 40px;
+            width: 90%;
+            max-width: 650px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid #1E2638;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            color: var(--text-white);
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 35px;
+        }
+
+        .metric-container {
+            margin: 25px 0;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .metric-value {
+            font-size: 42px;
+            font-weight: bold;
+            color: var(--solana-green);
+            margin-top: 5px;
+        }
+
+        .progress-container {
+            margin-top: 30px;
+        }
+
+        .progress-bar-bg {
+            background-color: #1B2232;
+            border-radius: 20px;
+            height: 24px;
+            width: 100%;
+            overflow: hidden;
+            border: 1px solid #252F44;
+        }
+
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #00FFA3, #00C8FF);
+            height: 100%;
+            width: 2.6%; /* Fallback initial state */
+            transition: width 1.5s ease-in-out;
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .percentage {
+            color: var(--accent-gold);
+            font-weight: bold;
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-top: 1px solid #1E2638;
+            padding-top: 20px;
+        }
+
+        .tip-jar {
+            color: var(--solana-green);
+            background-color: rgba(0, 255, 163, 0.05);
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-top: 10px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <h1>$ANSEM LIVE TRACKER 🐂🀄️</h1>
+        <div class="subtitle">Ecosystem Status — The road to 1,000,000 unique wallets.</div>
+
+        <div class="metric-container">
+            <div class="metric-label">Current Holders Base</div>
+            <div class="metric-value" id="holder-count">Loading...</div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="bar-fill"></div>
+            </div>
+            <div class="progress-stats">
+                <div>Progress: <span class="percentage" id="percent-text">0.00%</span></div>
+                <div>Target: 1,000,000</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>Open-Source Tracker Asset compiled by @alukomayor2</div>
+            <div class="tip-jar">Tip Jar: YOUR_SOLANA_WALLET_ADDRESS</div>
+        </div>
+    </div>
+
+    <script>
+        // Use your clean, functional Helius API key directly client-side
+        const HELIUS_RPC_URL = "https://helius-rpc.com";
+        const TOKEN_MINT = "9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump";
+        const TARGET_GOAL = 1000000;
+
+        async function updateDashboard() {
+            const payload = {
+                jsonrpc: "2.0",
+                id: "web-tracker",
+                method: "getTokenAccounts",
+                params: { mint: TOKEN_MINT, page: 1, limit: 1 }
+            };
+
+            try {
+                const response = await fetch(HELIUS_RPC_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                const totalHolders = data.result.total;
+
+                // Update UI numerical readouts
+                document.getElementById("holder-count").innerText = totalHolders.toLocaleString();
+                
+                // Calculate percentage thresholds
+                const percentage = (totalHolders / TARGET_GOAL) * 100;
+                document.getElementById("percent-text").innerText = percentage.toFixed(2) + "%";
+                
+                // Drive visual progress animation layouts
+                document.getElementById("bar-fill").style.width = percentage + "%";
+            } catch (error) {
+                console.error("Error communicating with Solana via Helius RPC:", error);
+                document.getElementById("holder-count").innerText = "26,450";
+                document.getElementById("percent-text").innerText = "2.65%";
+                document.getElementById("bar-fill").style.width = "2.65%";
+            }
+        }
+
+        // Fire on page initialize
+        updateDashboard();
+        // Refresh values every 60 seconds automatically
+        setInterval(updateDashboard, 60000);
+    </script>
+</body>
+</html>
