@@ -127,15 +127,42 @@
             padding-top: 20px;
         }
 
+                .tip-jar-container {
+            margin-top: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(0, 255, 163, 0.05);
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 163, 0.1);
+        }
+
         .tip-jar {
             color: var(--solana-green);
-            background-color: rgba(0, 255, 163, 0.05);
-            padding: 8px 12px;
-            border-radius: 6px;
-            display: inline-block;
-            margin-top: 10px;
             font-family: monospace;
+            font-size: 13px;
+            letter-spacing: 0.5px;
         }
+
+        .copy-btn {
+            background-color: var(--solana-green);
+            color: #07090E;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        } 
     </style>
 </head>
 <body>
@@ -161,9 +188,12 @@
 
         <div class="footer">
             <div>Open-Source Tracker Asset compiled by @alukomayor2</div>
-            <div class="tip-jar">CykNaBUPZqPjsFwPffCoriaadondj27arTw7Df9ajNZc</div>
+            <div class="tip-jar-container">
+                <span class="tip-jar" id="wallet-address">CykNaBUPZqPjsFwPffCoriaadondj27arTw7Df9ajNZc</span>
+                <button class="copy-btn" id="copy-button" onclick="copyWalletAddress()">Copy</button>
+            </div>
         </div>
-    </div>
+
 
         <script>
         // Optimized to pull from Helius's high-speed token endpoint
@@ -212,6 +242,23 @@
         updateDashboard();
         // Refresh values every 60 seconds automatically
         setInterval(updateDashboard, 60000);
+        function copyWalletAddress() {
+            const walletText = document.getElementById("wallet-address").innerText;
+            const copyBtn = document.getElementById("copy-button");
+            
+            navigator.clipboard.writeText(walletText).then(() => {
+                copyBtn.innerText = "Copied!";
+                copyBtn.style.backgroundColor = "#E4A834";
+                
+                setTimeout(() => {
+                    copyBtn.innerText = "Copy";
+                    copyBtn.style.backgroundColor = "#00FFA3";
+                }, 2000);
+            }).catch(err => {
+                console.error("Could not copy wallet text to clipboard: ", err);
+            });
+        }
+  
     </script>
 
 </body>
